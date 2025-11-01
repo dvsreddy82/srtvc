@@ -4,11 +4,12 @@
 # Usage: ./create-github-repo.sh YOUR_GITHUB_TOKEN
 
 REPO_NAME="PET-MANAGEMENT"
-GITHUB_TOKEN=$1
+GITHUB_TOKEN=${1:-$GITHUB_TOKEN}
 
 if [ -z "$GITHUB_TOKEN" ]; then
     echo "Error: GitHub token required"
     echo "Usage: ./create-github-repo.sh YOUR_GITHUB_TOKEN"
+    echo "   OR: export GITHUB_TOKEN=your_token && ./create-github-repo.sh"
     echo ""
     echo "To create a token:"
     echo "1. Go to https://github.com/settings/tokens"
@@ -56,11 +57,22 @@ if [ "$HTTP_CODE" -eq 201 ]; then
         git remote add origin "$HTTPS_URL" 2>/dev/null || git remote set-url origin "$HTTPS_URL"
         echo "✓ Remote 'origin' configured"
         echo ""
-        echo "Next steps:"
-        echo "1. git add ."
-        echo "2. git commit -m 'Initial commit'"
-        echo "3. git branch -M main"
-        echo "4. git push -u origin main"
+        
+        # Ensure we're on main branch
+        CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "main")
+        if [ "$CURRENT_BRANCH" != "main" ]; then
+            git branch -M main 2>/dev/null || true
+        fi
+        
+        # Push to GitHub
+        echo "Pushing code to GitHub..."
+        # Use token in URL for authentication
+        REPO_URL_WITH_TOKEN=$(echo "$HTTPS_URL" | sed "s|https://|https://${GITHUB_TOKEN}@|")
+        git push -u "$REPO_URL_WITH_TOKEN" main 2>&1 || {
+            echo "Note: If push failed, you may need to authenticate manually."
+            echo "Try: git push -u origin main"
+        }
+        echo "✓ Code pushed to GitHub!"
     fi
 else
     echo "Error: Failed to create repository"
