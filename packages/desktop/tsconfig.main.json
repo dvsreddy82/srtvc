@@ -3,8 +3,8 @@
     "target": "ES2020",
     "module": "commonjs",
     "lib": ["ES2020"],
-    "outDir": "./dist/main",
-    "rootDir": "./src/main",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -12,7 +12,7 @@
     "resolveJsonModule": true,
     "moduleResolution": "node"
   },
-  "include": ["src/main/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/main/**/*", "src/services/**/*", "src/utils/**/*", "src/config/**/*"],
+  "exclude": ["node_modules", "dist", "src/renderer"]
 }
 

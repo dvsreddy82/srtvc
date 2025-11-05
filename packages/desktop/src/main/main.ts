@@ -1,7 +1,6 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron';
 import * as path from 'path';
 import { localStorageService } from '../services/localStorageService';
-import { fileService } from '../services/fileService';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -25,8 +24,11 @@ function createWindow(): void {
   localStorageService.init().catch(console.error);
 
   // In development, load from web dev server
-  if (process.env.NODE_ENV === 'development') {
-    mainWindow.loadURL('http://localhost:5173'); // Vite default port
+  // Check if running in development (not packaged)
+  const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
+  
+  if (isDev) {
+    mainWindow.loadURL('http://localhost:3000'); // Web dev server port
     mainWindow.webContents.openDevTools();
   } else {
     // In production, load from built renderer

@@ -5,7 +5,8 @@
  */
 
 import { nativeImage } from 'electron';
-import * as sharp from 'sharp';
+import sharp from 'sharp';
+import { IMAGE_CONFIG } from '@pet-management/shared';
 
 export class DesktopImageService {
   /**
