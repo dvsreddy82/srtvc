@@ -1,0 +1,26 @@
+{
+  "name": "pet-management-app",
+  "version": "1.0.0",
+  "description": "Pet Management Cloud - React + React Native + Electron + Firebase",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "cd packages/web && npm run dev",
+    "dev:mobile": "cd packages/mobile && npm run ios",
+    "dev:desktop": "cd packages/desktop && npm run dev",
+    "build:web": "cd packages/web && npm run build",
+    "build:mobile": "cd packages/mobile && npm run build",
+    "build:desktop": "cd packages/desktop && npm run build",
+    "install:all": "npm install && cd packages/shared && npm install && cd ../web && npm install && cd ../mobile && npm install && cd ../desktop && npm install"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
+

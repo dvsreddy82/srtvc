@@ -1,25 +1,25 @@
-**User Stories — Pet Management Cloud (Flutter + Firebase Architecture)**
+**User Stories — Pet Management Cloud (React + React Native + Electron + Firebase Architecture)**
 
 **Platform Stack:**
-- **Frontend Framework:** Flutter (Dart) - Single Codebase for iOS, Android, Web, and Desktop
+- **Frontend Framework:** React (Web) + React Native (iOS/Android) + Electron (Desktop: macOS, Windows, Linux)
 - **Authentication:** Firebase Authentication
 - **Database:** Cloud Firestore (NoSQL)
 - **Storage:** Firebase Storage
 - **Functions:** Cloud Functions (2nd gen)
 - **Scheduling:** Cloud Scheduler
 - **Notifications:** Firebase Cloud Messaging (FCM)
-- **Hosting:** Firebase Hosting (Web) / App Stores (Mobile)
+- **Hosting:** Firebase Hosting (Web) / App Stores (Mobile) / Desktop Installers
 - **Email:** Cloud Functions + Resend/SendGrid Integration
 
 **Cost Optimization Targets:** $4-11/month (Medium Scale)
 
-**Flutter Architecture Benefits:**
-- ✅ **Single Codebase:** Write once, deploy to iOS, Android, Web, macOS, Windows, Linux
-- ✅ **Native Performance:** Compiles to native ARM code (not JavaScript bridge)
-- ✅ **Excellent Firebase Support:** Official Firebase Flutter plugins maintained by Firebase team
-- ✅ **Hot Reload:** Fast development with instant code updates
-- ✅ **Rich UI Components:** Material Design and Cupertino widgets built-in
-- ✅ **Offline First:** Perfect for Firestore offline persistence requirements
+**React + React Native + Electron Architecture Benefits:**
+- ✅ **Shared Codebase:** Share business logic, services, and utilities across Web, Mobile, and Desktop
+- ✅ **Native Performance:** React Native compiles to native code, Electron uses native WebView
+- ✅ **Excellent Firebase Support:** Official Firebase JavaScript SDK with React hooks and React Native Firebase
+- ✅ **Fast Refresh:** Instant code updates during development (HMR for React, Fast Refresh for React Native)
+- ✅ **Rich UI Components:** Material-UI, Ant Design, React Native Paper, or custom components
+- ✅ **Offline First:** Perfect for Firestore offline persistence with IndexedDB (Web), SQLite (Mobile/Desktop), and local storage
 
 ---
 
@@ -27,21 +27,21 @@
 
 | ID | User Story | Acceptance Criteria | Firebase Services | Optimization Notes |
 | ----- | ----- | ----- | ----- | ----- |
-| PO-01 | As a pet owner, I want to create an account so that I can securely log in and manage my pets. | - Firebase Auth signup & email verification works via Flutter `firebase_auth` package.<br>- User profile stored in Firestore `/users/{userId}` using `cloud_firestore`.<br>- JWT token issued via Firebase Auth automatically handled.<br>- Offline persistence enabled using Firestore `Settings(persistenceEnabled: true)` in Flutter. | Firebase Auth<br>Cloud Firestore | Use email/password auth (free <10K users). Enable Firestore offline persistence via `firestore.settings` in Flutter initialization. Cache user profile locally with Hive for instant access. |
-| PO-02 | As a pet owner, I want to register my pet's details so that I can track its information in one place. | - Flutter form with TextFields for pet name, species, breed, DOB, weight.<br>- Photo selection via `image_picker` package, compression using `image` package.<br>- **Data saved to Hive local database (primary)**, then synced to Firestore in background.<br>- Photo uploaded to Firebase Storage via `firebase_storage` with automatic compression.<br>- Confirmation displayed from local Hive cache (instant, no cloud read). | Cloud Firestore<br>Firebase Storage<br>Cloud Functions<br>Hive (Local) | **Local-First:** Store pets in Hive, read from local always. Sync to Firestore only on create/update. Reduces reads by ~95%. Compress images client-side (800px width, 85% quality). Use `ListView.builder` for efficient rendering. |
+| PO-01 | As a pet owner, I want to create an account so that I can securely log in and manage my pets. | - Firebase Auth signup & email verification works via React/React Native `firebase/auth` SDK.<br>- User profile stored in Firestore `/users/{userId}` using `firebase/firestore`.<br>- JWT token issued via Firebase Auth automatically handled.<br>- Offline persistence enabled using Firestore `enableIndexedDbPersistence()` (Web) or `enableNetwork()` settings (React Native). | Firebase Auth<br>Cloud Firestore | Use email/password auth (free <10K users). Enable Firestore offline persistence via `enableIndexedDbPersistence()` (Web) or native persistence (React Native). Cache user profile locally with IndexedDB (Web) or SQLite (Mobile/Desktop) for instant access. |
+| PO-02 | As a pet owner, I want to register my pet's details so that I can track its information in one place. | - React form with input fields for pet name, species, breed, DOB, weight.<br>- Photo selection via `react-native-image-picker` (Mobile) or HTML file input (Web), compression using `browser-image-compression` (Web) or `react-native-image-resizer` (Mobile).<br>- **Data saved to IndexedDB (Web) or SQLite (Mobile/Desktop) local database (primary)**, then synced to Firestore in background.<br>- Photo uploaded to Firebase Storage via `firebase/storage` with automatic compression.<br>- Confirmation displayed from local cache (instant, no cloud read). | Cloud Firestore<br>Firebase Storage<br>Cloud Functions<br>IndexedDB/SQLite (Local) | **Local-First:** Store pets in IndexedDB (Web) or SQLite (Mobile/Desktop), read from local always. Sync to Firestore only on create/update. Reduces reads by ~95%. Compress images client-side (800px width, 85% quality). Use virtualized lists (React Native `FlatList` or React `react-window`) for efficient rendering. |
 | PO-03 | As a pet owner, I want to upload vaccine documents or photos so I can maintain health records digitally. | - Upload via Firebase Storage with security rules.<br>- Metadata stored in Firestore `/medical_records/{recordId}` with `petId` reference.<br>- Record linked to pet profile via Firestore reference.<br>- Automatic thumbnail generation via Cloud Function. | Firebase Storage<br>Cloud Firestore<br>Cloud Functions | Use storage security rules to restrict access. Generate thumbnails on upload to reduce bandwidth. Use batch writes to create record + metadata atomically. |
-| PO-04 | As a pet owner, I want to view my pet's upcoming vaccine and health due dates so I can stay informed. | - **Vaccine schedule stored in local SQLite**, calculated from local pet data (no cloud query).<br>- Display from local database instantly, sync vaccine data monthly from Firestore.<br>- FCM push notifications configured for reminders (server-side).<br>- Email notifications via Cloud Function + Resend. | Cloud Firestore<br>FCM<br>Cloud Functions<br>Cloud Scheduler<br>SQLite (Local) | **Local-First:** Store vaccine schedule in SQLite, calculate due dates locally. Sync vaccine data monthly. Reduces reads by ~95%. FCM reminders triggered server-side (Cloud Function). Batch notification sends. |
-| PO-05 | As a pet owner, I want to search available kennels based on my pet's size and dates so that I can book a stay. | - **Kennel master data stored in local Hive** (synced weekly). Search runs locally first.<br>- Only query Firestore for real-time availability (status changes).<br>- Returns available runs using local SQLite queries for historical bookings.<br>- Results paginated (limit 20 per page) from local cache. | Cloud Firestore<br>Hive (Local)<br>SQLite (Local) | **Local-First:** Store kennel data in Hive (weekly sync). Search locally. Only query Firestore for current availability status. Reduces reads by ~80%. Use composite indexes for availability queries only. |
+| PO-04 | As a pet owner, I want to view my pet's upcoming vaccine and health due dates so I can stay informed. | - **Vaccine schedule stored in local SQLite (Mobile/Desktop) or IndexedDB (Web)**, calculated from local pet data (no cloud query).<br>- Display from local database instantly, sync vaccine data monthly from Firestore.<br>- FCM push notifications configured for reminders (server-side).<br>- Email notifications via Cloud Function + Resend. | Cloud Firestore<br>FCM<br>Cloud Functions<br>Cloud Scheduler<br>SQLite/IndexedDB (Local) | **Local-First:** Store vaccine schedule in SQLite/IndexedDB, calculate due dates locally. Sync vaccine data monthly. Reduces reads by ~95%. FCM reminders triggered server-side (Cloud Function). Batch notification sends. |
+| PO-05 | As a pet owner, I want to search available kennels based on my pet's size and dates so that I can book a stay. | - **Kennel master data stored in local IndexedDB (Web) or SQLite (Mobile/Desktop)** (synced weekly). Search runs locally first.<br>- Only query Firestore for real-time availability (status changes).<br>- Returns available runs using local database queries for historical bookings.<br>- Results paginated (limit 20 per page) from local cache. | Cloud Firestore<br>IndexedDB/SQLite (Local) | **Local-First:** Store kennel data in IndexedDB/SQLite (weekly sync). Search locally. Only query Firestore for current availability status. Reduces reads by ~80%. Use composite indexes for availability queries only. |
 | PO-06 | As a pet owner, I want to make a kennel booking and receive confirmation. | - Booking created in Firestore `/bookings/{bookingId}` with status "pending".<br>- Payment flow completes (integrate Stripe/PayPal webhook).<br>- Status updated to "confirmed" via Cloud Function trigger.<br>- Confirmation sent via FCM push + email (Resend) simultaneously.<br>- Real-time booking update visible to staff. | Cloud Firestore<br>Cloud Functions<br>FCM<br>Resend API | Use Firestore transactions for atomic booking creation + availability update. Batch notification sends. Cache booking status client-side. Use Cloud Function to process payment webhooks asynchronously. |
-| PO-07 | As a pet owner, I want to receive updates during my pet's stay so I know how my pet is doing. | - **Stay updates stored in local SQLite** (primary source). Sync from Firestore every 15 minutes (batch).<br>- Display from local database instantly, background sync updates local cache.<br>- FCM push via `firebase_messaging` package handles foreground/background notifications (triggers local refresh).<br>- Daily notes displayed with `ListView.builder` from local SQLite, pagination (20 items per page).<br>- Photos auto-compressed using Flutter `image` package before upload. | Cloud Firestore<br>Cloud Functions<br>FCM<br>Firebase Storage<br>SQLite (Local) | **Local-First:** Store stay updates in SQLite, read from local always. Batch sync every 15 min from Firestore. Reduces reads by ~85%. FCM notifications trigger local refresh. Compress photos client-side (800px width). Use `cached_network_image` for thumbnails. |
-| PO-08 | As a pet owner, I want to view invoices and past bookings for tracking expenses. | - **Invoices cached locally in file system** (download once, cache forever). PDFs stored locally after first download.<br>- **Past bookings stored in local SQLite** (sync once, never re-read from cloud).<br>- Invoice metadata synced from Firestore on login only.<br>- All queries run from local database (zero cloud reads after initial sync). | Firebase Storage<br>Firebase Storage<br>Firestore<br>Cloud Functions<br>SQLite (Local)<br>File System | **Local-First:** Invoices downloaded once and cached forever in local file system. Past bookings in SQLite (sync once). Reduces reads by ~100% for past data. Only sync new invoices on demand. Use composite index on `userId + createdAt` for initial sync only. |
+| PO-07 | As a pet owner, I want to receive updates during my pet's stay so I know how my pet is doing. | - **Stay updates stored in local SQLite/IndexedDB** (primary source). Sync from Firestore every 15 minutes (batch).<br>- Display from local database instantly, background sync updates local cache.<br>- FCM push via `@react-native-firebase/messaging` (Mobile) or `firebase/messaging` (Web) handles foreground/background notifications (triggers local refresh).<br>- Daily notes displayed with virtualized lists from local database, pagination (20 items per page).<br>- Photos auto-compressed using client-side libraries before upload. | Cloud Firestore<br>Cloud Functions<br>FCM<br>Firebase Storage<br>SQLite/IndexedDB (Local) | **Local-First:** Store stay updates in SQLite/IndexedDB, read from local always. Batch sync every 15 min from Firestore. Reduces reads by ~85%. FCM notifications trigger local refresh. Compress photos client-side (800px width). Use image caching libraries for thumbnails. |
+| PO-08 | As a pet owner, I want to view invoices and past bookings for tracking expenses. | - **Invoices cached locally in file system** (download once, cache forever). PDFs stored locally after first download.<br>- **Past bookings stored in local SQLite/IndexedDB** (sync once, never re-read from cloud).<br>- Invoice metadata synced from Firestore on login only.<br>- All queries run from local database (zero cloud reads after initial sync). | Firebase Storage<br>Firebase Storage<br>Firestore<br>Cloud Functions<br>SQLite/IndexedDB (Local)<br>File System | **Local-First:** Invoices downloaded once and cached forever in local file system. Past bookings in SQLite/IndexedDB (sync once). Reduces reads by ~100% for past data. Only sync new invoices on demand. Use composite index on `userId + createdAt` for initial sync only. |
 | PO-09 | As a pet owner, I want to rate and review kennel stays. | - Review stored in Firestore `/reviews/{reviewId}` with `bookingId` reference.<br>- Linked to booking with Firestore reference (immutable).<br>- Staff cannot edit reviews (security rules enforce).<br>- Reviews queryable with pagination and rating filters. | Cloud Firestore | Use Firestore security rules: `allow write: if request.auth.uid == resource.data.userId && !exists(/databases/$(database)/documents/reviews/$(reviewId))`. Create index on `kennelId + rating` for filtering. Cache review averages. |
 
 **2. Kennel Staff Stories**
 
 | ID | User Story | Acceptance Criteria | Firebase Services | Optimization Notes |
 | ----- | ----- | ----- | ----- | ----- |
-| KS-01 | As a staff member, I want to view today's scheduled check-ins so I can prepare for arrivals. | - **Today's bookings stored in local SQLite** (primary source). Sync once in morning, refresh only on status change.<br>- Query local SQLite for bookings filtered by date and status (instant, no cloud read).<br>- Real-time sync only when booking status changes (via FCM notification).<br>- Flutter UI with `ListView.builder` from local database with optimistic updates. | Cloud Firestore<br>SQLite (Local)<br>FCM | **Local-First:** Store bookings in SQLite, load from local always. Sync once in morning, refresh on status changes via FCM. Reduces reads by ~70%. Use composite index for morning sync only. Display from local instantly. |
+| KS-01 | As a staff member, I want to view today's scheduled check-ins so I can prepare for arrivals. | - **Today's bookings stored in local SQLite/IndexedDB** (primary source). Sync once in morning, refresh only on status change.<br>- Query local database for bookings filtered by date and status (instant, no cloud read).<br>- Real-time sync only when booking status changes (via FCM notification).<br>- React/React Native UI with virtualized lists from local database with optimistic updates. | Cloud Firestore<br>SQLite/IndexedDB (Local)<br>FCM | **Local-First:** Store bookings in SQLite/IndexedDB, load from local always. Sync once in morning, refresh on status changes via FCM. Reduces reads by ~70%. Use composite index for morning sync only. Display from local instantly. |
 | KS-02 | As a staff member, I want to check-in a pet and record condition or notes. | - Status changes to "checked-in" via Firestore transaction (atomic update).<br>- Notes saved under `/bookings/{bookingId}/notes` subcollection.<br>- Owner notified via FCM + email via Cloud Function trigger.<br>- Real-time update visible to owner immediately. | Cloud Firestore<br>Cloud Functions<br>FCM | Use Firestore transactions to update booking + availability atomically. Batch notification send. Store notes as subcollection for better organization. Use optimistic updates in UI. |
 | KS-03 | As a staff member, I want to upload daily photos and notes during a pet's stay. | - Photos uploaded to Firebase Storage `/stay_photos/{bookingId}/{timestamp}`.<br>- Metadata written to Firestore `/stay_updates/{updateId}`.<br>- Cloud Function triggered on Storage upload sends FCM notification to owner.<br>- Notes timestamped automatically via Firestore server timestamp.<br>- Photos auto-compressed and thumbnail generated. | Firebase Storage<br>Cloud Functions<br>Cloud Firestore<br>FCM | Compress images client-side before upload. Generate thumbnails via Cloud Function (reduces bandwidth). Use batch writes for photo metadata + update record. Batch notifications (not per-photo). Store thumbnails separately for list views. |
 | KS-04 | As a staff member, I want to check-out a pet and generate a summary report. | - Status changes to "checked-out" via Firestore transaction.<br>- Cloud Function triggered to generate PDF invoice from Firestore data.<br>- Invoice saved to Firebase Storage and metadata to Firestore.<br>- Owner notified via FCM + email with invoice link.<br>- Booking availability released atomically. | Cloud Firestore<br>Cloud Functions<br>Firebase Storage<br>FCM | Generate invoice PDF asynchronously (don't block checkout). Use Firestore transaction for checkout + availability release. Cache invoice template. Send notifications after PDF generation completes. |
@@ -240,92 +240,118 @@ service firebase.storage {
 
 ---
 
-**13. Flutter Architecture & Implementation**
+**13. React + React Native + Electron Architecture & Implementation**
 
 **Project Structure:**
 ```
-pet_management_app/
-├── lib/
-│   ├── main.dart                      # App entry point
-│   ├── app.dart                        # MaterialApp configuration
-│   ├── core/
-│   │   ├── config/
-│   │   │   └── firebase_options.dart   # Firebase configuration
-│   │   ├── services/
-│   │   │   ├── auth_service.dart      # Firebase Auth wrapper
-│   │   │   ├── firestore_service.dart # Firestore operations
-│   │   │   ├── storage_service.dart    # Firebase Storage operations
-│   │   │   ├── fcm_service.dart       # Push notifications
-│   │   │   └── notification_service.dart
-│   │   ├── models/                     # Data models
-│   │   │   ├── user_model.dart
-│   │   │   ├── pet_model.dart
-│   │   │   ├── booking_model.dart
-│   │   │   └── medical_record_model.dart
-│   │   ├── repositories/              # Data repositories
-│   │   │   ├── pet_repository.dart
-│   │   │   ├── booking_repository.dart
-│   │   │   └── user_repository.dart
-│   │   └── utils/
-│   │       ├── image_compression.dart
-│   │       ├── validators.dart
-│   │       └── constants.dart
-│   ├── features/
-│   │   ├── auth/
-│   │   │   ├── presentation/
-│   │   │   │   ├── screens/
-│   │   │   │   │   ├── login_screen.dart
-│   │   │   │   │   └── signup_screen.dart
-│   │   │   │   └── widgets/
-│   │   │   └── domain/
-│   │   │       └── auth_bloc.dart     # State management (BLoC)
-│   │   ├── pet_owner/
-│   │   │   ├── pets/
-│   │   │   │   ├── presentation/
-│   │   │   │   │   ├── screens/
-│   │   │   │   │   │   ├── pets_list_screen.dart
-│   │   │   │   │   │   ├── pet_details_screen.dart
-│   │   │   │   │   │   └── add_pet_screen.dart
-│   │   │   │   │   └── widgets/
-│   │   │   │   └── domain/
-│   │   │   │       └── pet_bloc.dart
-│   │   │   ├── bookings/
-│   │   │   │   ├── presentation/
-│   │   │   │   │   ├── screens/
-│   │   │   │   │   │   ├── bookings_list_screen.dart
-│   │   │   │   │   │   ├── booking_details_screen.dart
-│   │   │   │   │   │   └── kennel_search_screen.dart
-│   │   │   │   │   └── widgets/
-│   │   │   │   └── domain/
-│   │   │   │       └── booking_bloc.dart
-│   │   │   └── dashboard/
-│   │   │       └── owner_dashboard_screen.dart
-│   │   ├── staff/
-│   │   │   ├── check_ins/
-│   │   │   │   ├── presentation/
-│   │   │   │   │   ├── screens/
-│   │   │   │   │   │   └── check_in_screen.dart
-│   │   │   │   │   └── widgets/
-│   │   │   │   └── domain/
-│   │   │   │       └── check_in_bloc.dart
-│   │   │   └── stay_updates/
-│   │   │       └── stay_update_screen.dart
-│   │   ├── manager/
-│   │   │   ├── dashboard/
-│   │   │   │   └── manager_dashboard_screen.dart
-│   │   │   └── reports/
-│   │   │       └── reports_screen.dart
-│   │   └── admin/
-│   │       └── admin_panel_screen.dart
-│   └── shared/
-│       ├── widgets/
-│       │   ├── pet_card.dart
-│       │   ├── booking_card.dart
-│       │   ├── image_upload_widget.dart
-│       │   └── loading_indicator.dart
-│       └── themes/
-│           └── app_theme.dart
-├── cloud_functions/
+pet-management-app/
+├── packages/
+│   ├── shared/                       # Shared code (business logic, services, models)
+│   │   ├── src/
+│   │   │   ├── services/
+│   │   │   │   ├── authService.ts
+│   │   │   │   ├── firestoreService.ts
+│   │   │   │   ├── storageService.ts
+│   │   │   │   ├── fcmService.ts
+│   │   │   │   └── notificationService.ts
+│   │   │   ├── models/
+│   │   │   │   ├── user.ts
+│   │   │   │   ├── pet.ts
+│   │   │   │   ├── booking.ts
+│   │   │   │   └── medicalRecord.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── petRepository.ts
+│   │   │   │   ├── bookingRepository.ts
+│   │   │   │   └── userRepository.ts
+│   │   │   ├── utils/
+│   │   │   │   ├── imageCompression.ts
+│   │   │   │   ├── validators.ts
+│   │   │   │   └── constants.ts
+│   │   │   └── config/
+│   │   │       └── firebase.ts
+│   │   └── package.json
+│   │
+│   ├── web/                          # React Web App
+│   │   ├── src/
+│   │   │   ├── main.tsx              # App entry point
+│   │   │   ├── App.tsx
+│   │   │   ├── features/
+│   │   │   │   ├── auth/
+│   │   │   │   │   ├── components/
+│   │   │   │   │   │   ├── Login.tsx
+│   │   │   │   │   │   └── Signup.tsx
+│   │   │   │   │   └── hooks/
+│   │   │   │   │       └── useAuth.ts
+│   │   │   │   ├── petOwner/
+│   │   │   │   │   ├── pets/
+│   │   │   │   │   │   ├── components/
+│   │   │   │   │   │   │   ├── PetsList.tsx
+│   │   │   │   │   │   │   ├── PetDetails.tsx
+│   │   │   │   │   │   │   └── AddPet.tsx
+│   │   │   │   │   │   └── hooks/
+│   │   │   │   │   │       └── usePets.ts
+│   │   │   │   │   ├── bookings/
+│   │   │   │   │   │   └── components/
+│   │   │   │   │   │       ├── BookingsList.tsx
+│   │   │   │   │   │       ├── BookingDetails.tsx
+│   │   │   │   │   │       └── KennelSearch.tsx
+│   │   │   │   │   └── dashboard/
+│   │   │   │   │       └── OwnerDashboard.tsx
+│   │   │   │   ├── staff/
+│   │   │   │   │   ├── checkIns/
+│   │   │   │   │   │   └── components/
+│   │   │   │   │   │       └── CheckIn.tsx
+│   │   │   │   │   └── stayUpdates/
+│   │   │   │   │       └── StayUpdates.tsx
+│   │   │   │   ├── manager/
+│   │   │   │   │   ├── dashboard/
+│   │   │   │   │   │   └── ManagerDashboard.tsx
+│   │   │   │   │   └── reports/
+│   │   │   │   │       └── Reports.tsx
+│   │   │   │   └── admin/
+│   │   │   │       └── AdminPanel.tsx
+│   │   │   ├── shared/
+│   │   │   │   ├── components/
+│   │   │   │   │   ├── PetCard.tsx
+│   │   │   │   │   ├── BookingCard.tsx
+│   │   │   │   │   ├── ImageUpload.tsx
+│   │   │   │   │   └── LoadingIndicator.tsx
+│   │   │   │   └── theme/
+│   │   │   │       └── theme.ts
+│   │   │   └── store/                # State management (Redux/Zustand)
+│   │   │       ├── slices/
+│   │   │       │   ├── authSlice.ts
+│   │   │       │   ├── petSlice.ts
+│   │   │       │   └── bookingSlice.ts
+│   │   │       └── store.ts
+│   │   ├── package.json
+│   │   ├── vite.config.ts            # or webpack.config.js
+│   │   └── index.html
+│   │
+│   ├── mobile/                      # React Native App (iOS/Android)
+│   │   ├── src/
+│   │   │   ├── App.tsx
+│   │   │   ├── navigation/
+│   │   │   │   └── AppNavigator.tsx
+│   │   │   ├── features/            # Same structure as web
+│   │   │   ├── shared/             # Same structure as web
+│   │   │   └── store/              # Same structure as web
+│   │   ├── ios/
+│   │   ├── android/
+│   │   ├── package.json
+│   │   └── metro.config.js
+│   │
+│   └── desktop/                     # Electron App (macOS/Windows/Linux)
+│       ├── src/
+│       │   ├── main/                # Electron main process
+│       │   │   ├── main.ts
+│       │   │   └── preload.ts
+│       │   └── renderer/           # Electron renderer (uses web package)
+│       │       └── index.html
+│       ├── package.json
+│       └── electron-builder.json
+│
+├── cloud-functions/
 │   ├── functions/
 │   │   ├── src/
 │   │   │   ├── onBookingCreate.ts
@@ -333,224 +359,428 @@ pet_management_app/
 │   │   │   └── vaccineReminders.ts
 │   │   └── package.json
 │   └── firebase.json
-├── pubspec.yaml                      # Flutter dependencies
-├── analysis_options.yaml            # Dart linter rules
+│
+├── package.json                     # Root package.json (monorepo)
+├── pnpm-workspace.yaml              # or yarn workspaces / lerna
 └── README.md
 ```
 
-**Flutter Dependencies (pubspec.yaml):**
-```yaml
-dependencies:
-  flutter:
-    sdk: flutter
-  
-  # Firebase
-  firebase_core: ^3.0.0
-  firebase_auth: ^5.0.0
-  cloud_firestore: ^5.0.0
-  firebase_storage: ^12.0.0
-  firebase_messaging: ^15.0.0
-  firebase_analytics: ^11.0.0
-  
-  # State Management (BLoC Pattern)
-  flutter_bloc: ^8.1.0
-  equatable: ^2.0.5
-  
-  # Dependency Injection
-  get_it: ^7.6.0
-  
-  # Image Processing
-  image_picker: ^1.0.0
-  image: ^4.1.0
-  
-  # UI Components
-  cached_network_image: ^3.3.0
-  flutter_svg: ^2.0.0
-  
-  # Utilities
-  intl: ^0.19.0
-  shared_preferences: ^2.2.0
-  connectivity_plus: ^5.0.0
-  
-  # PDF Generation (for invoices)
-  pdf: ^3.10.0
-  printing: ^5.11.0
-  
-  # Local Database (for offline caching)
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
+**React/React Native/Electron Dependencies (package.json):**
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^3.0.0
-  build_runner: ^2.4.0
-  hive_generator: ^2.0.0
+**Shared Package (packages/shared/package.json):**
+```json
+{
+  "dependencies": {
+    "firebase": "^10.0.0",
+    "@react-native-firebase/app": "^18.0.0",
+    "@react-native-firebase/auth": "^18.0.0",
+    "@react-native-firebase/firestore": "^18.0.0",
+    "@react-native-firebase/storage": "^18.0.0",
+    "@react-native-firebase/messaging": "^18.0.0",
+    "idb": "^7.0.0",
+    "react-native-sqlite-storage": "^6.0.0",
+    "better-sqlite3": "^9.0.0",
+    "browser-image-compression": "^2.0.0",
+    "react-native-image-resizer": "^3.0.0",
+    "date-fns": "^2.30.0",
+    "zod": "^3.22.0"
+  }
+}
 ```
 
-**Key Flutter Implementation Patterns:**
+**Web Package (packages/web/package.json):**
+```json
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "@reduxjs/toolkit": "^2.0.0",
+    "react-redux": "^9.0.0",
+    "zustand": "^4.4.0",
+    "@mui/material": "^5.14.0",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "react-window": "^1.8.10",
+    "react-pdf": "^7.6.0",
+    "jspdf": "^2.5.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@types/react": "^18.2.0",
+    "typescript": "^5.3.0",
+    "eslint": "^8.55.0"
+  }
+}
+```
 
-1. **State Management - BLoC Pattern:**
-   ```dart
-   // Example: Pet BLoC
-   class PetBloc extends Bloc<PetEvent, PetState> {
-     final PetRepository _repository;
-     
-     PetBloc(this._repository) : super(PetInitial()) {
-       on<LoadPets>(_onLoadPets);
-       on<AddPet>(_onAddPet);
-       on<UpdatePet>(_onUpdatePet);
+**React Native Package (packages/mobile/package.json):**
+```json
+{
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-native": "^0.73.0",
+    "@react-navigation/native": "^6.1.0",
+    "@react-navigation/stack": "^6.3.0",
+    "@reduxjs/toolkit": "^2.0.0",
+    "react-redux": "^9.0.0",
+    "react-native-paper": "^5.11.0",
+    "react-native-vector-icons": "^10.0.0",
+    "@react-native-community/netinfo": "^11.0.0",
+    "react-native-image-picker": "^7.0.0",
+    "react-native-fs": "^2.20.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-native": "^0.73.0",
+    "typescript": "^5.3.0",
+    "metro-react-native-babel-preset": "^0.77.0"
+  }
+}
+```
+
+**Electron Package (packages/desktop/package.json):**
+```json
+{
+  "dependencies": {
+    "electron": "^28.0.0",
+    "electron-updater": "^6.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "electron-builder": "^24.9.0",
+    "typescript": "^5.3.0"
+  }
+}
+```
+
+**Key React + React Native + Electron Implementation Patterns:**
+
+1. **State Management - Redux Toolkit (or Zustand):**
+   ```typescript
+   // Example: Pet Slice (Redux Toolkit)
+   // packages/web/src/store/slices/petSlice.ts
+   import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+   import { petRepository } from '@shared/repositories/petRepository';
+   
+   export const loadPets = createAsyncThunk(
+     'pets/loadPets',
+     async (userId: string) => {
+       return await petRepository.getPets(userId);
      }
-     
-     Future<void> _onLoadPets(
-       LoadPets event,
-       Emitter<PetState> emit,
-     ) async {
-       emit(PetLoading());
+   );
+   
+   const petSlice = createSlice({
+     name: 'pets',
+     initialState: { pets: [], loading: false, error: null },
+     reducers: {},
+     extraReducers: (builder) => {
+       builder
+         .addCase(loadPets.pending, (state) => {
+           state.loading = true;
+         })
+         .addCase(loadPets.fulfilled, (state, action) => {
+           state.loading = false;
+           state.pets = action.payload;
+         })
+         .addCase(loadPets.rejected, (state, action) => {
+           state.loading = false;
+           state.error = action.error.message;
+         });
+     },
+   });
+   
+   export default petSlice.reducer;
+   ```
+
+   ```typescript
+   // Alternative: Zustand (Simpler)
+   // packages/shared/src/store/petStore.ts
+   import { create } from 'zustand';
+   import { petRepository } from '../repositories/petRepository';
+   
+   interface PetState {
+     pets: Pet[];
+     loading: boolean;
+     error: string | null;
+     loadPets: (userId: string) => Promise<void>;
+   }
+   
+   export const usePetStore = create<PetState>((set) => ({
+     pets: [],
+     loading: false,
+     error: null,
+     loadPets: async (userId: string) => {
+       set({ loading: true });
        try {
-         // Enable offline persistence
-         final pets = await _repository.getPetsStream(event.userId)
-             .listen((pets) => emit(PetLoaded(pets)));
-       } catch (e) {
-         emit(PetError(e.toString()));
+         const pets = await petRepository.getPets(userId);
+         set({ pets, loading: false });
+       } catch (error) {
+         set({ error: error.message, loading: false });
        }
+     },
+   }));
+   ```
+
+2. **Firestore Service with Offline Persistence:**
+   ```typescript
+   // packages/shared/src/services/firestoreService.ts
+   import { initializeApp } from 'firebase/app';
+   import { 
+     getFirestore, 
+     enableIndexedDbPersistence,
+     collection,
+     query,
+     where,
+     onSnapshot
+   } from 'firebase/firestore';
+   import { firebaseConfig } from '../config/firebase';
+   
+   const app = initializeApp(firebaseConfig);
+   const firestore = getFirestore(app);
+   
+   // Enable offline persistence (Web)
+   enableIndexedDbPersistence(firestore).catch((err) => {
+     if (err.code === 'failed-precondition') {
+       console.warn('Multiple tabs open, persistence can only be enabled in one tab');
+     }
+   });
+   
+   export class FirestoreService {
+     getPetsStream(userId: string, callback: (pets: Pet[]) => void) {
+       const q = query(
+         collection(firestore, 'pets'),
+         where('ownerId', '==', userId)
+       );
+       
+       return onSnapshot(q, (snapshot) => {
+         const pets = snapshot.docs.map((doc) => ({
+           id: doc.id,
+           ...doc.data()
+         } as Pet));
+         callback(pets);
+       });
      }
    }
    ```
 
-2. **Firestore Service with Offline Persistence:**
-   ```dart
-   class FirestoreService {
-     final FirebaseFirestore _firestore;
-     
-     FirestoreService() : _firestore = FirebaseFirestore.instance {
-       // Enable offline persistence
-       _firestore.settings = const Settings(
-         persistenceEnabled: true,
-         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-       );
-     }
-     
-     Stream<List<Pet>> getPetsStream(String userId) {
-       return _firestore
+   ```typescript
+   // React Native version
+   // packages/shared/src/services/firestoreService.rn.ts
+   import firestore from '@react-native-firebase/firestore';
+   
+   export class FirestoreServiceRN {
+     getPetsStream(userId: string, callback: (pets: Pet[]) => void) {
+       return firestore()
          .collection('pets')
-         .where('ownerId', isEqualTo: userId)
-         .snapshots()
-         .map((snapshot) => snapshot.docs
-           .map((doc) => Pet.fromFirestore(doc))
-           .toList());
+         .where('ownerId', '==', userId)
+         .onSnapshot((snapshot) => {
+           const pets = snapshot.docs.map((doc) => ({
+             id: doc.id,
+             ...doc.data()
+           } as Pet));
+           callback(pets);
+         });
      }
    }
    ```
 
 3. **Image Upload with Compression:**
-   ```dart
-   class ImageService {
-     Future<String> uploadPetPhoto(
-       File imageFile,
-       String userId,
-       String petId,
-     ) async {
+   ```typescript
+   // Web: packages/shared/src/services/imageService.ts
+   import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+   import imageCompression from 'browser-image-compression';
+   
+   export class ImageService {
+     async uploadPetPhoto(
+       file: File,
+       userId: string,
+       petId: string
+     ): Promise<string> {
        // Compress image before upload
-       final compressedFile = await _compressImage(imageFile);
+       const compressedFile = await imageCompression(file, {
+         maxSizeMB: 1,
+         maxWidthOrHeight: 800,
+         useWebWorker: true
+       });
        
-       final ref = FirebaseStorage.instance
-         .ref()
-         .child('pet_photos/$userId/$petId/${DateTime.now().millisecondsSinceEpoch}.jpg');
-       
-       final uploadTask = ref.putFile(compressedFile);
-       final snapshot = await uploadTask;
-       
-       return await snapshot.ref.getDownloadURL();
-     }
-     
-     Future<File> _compressImage(File file) async {
-       final image = img.decodeImage(await file.readAsBytes())!;
-       final compressed = img.copyResize(
-         image,
-         width: 800,
-         maintainAspect: true,
+       const storage = getStorage();
+       const storageRef = ref(
+         storage,
+         `pet_photos/${userId}/${petId}/${Date.now()}.jpg`
        );
-       final compressedBytes = img.encodeJpg(compressed, quality: 85);
-       return File(file.path.replaceAll('.jpg', '_compressed.jpg'))
-         ..writeAsBytesSync(compressedBytes);
+       
+       await uploadBytes(storageRef, compressedFile);
+       return await getDownloadURL(storageRef);
+     }
+   }
+   ```
+
+   ```typescript
+   // React Native: packages/shared/src/services/imageService.rn.ts
+   import storage from '@react-native-firebase/storage';
+   import ImageResizer from 'react-native-image-resizer';
+   
+   export class ImageServiceRN {
+     async uploadPetPhoto(
+       uri: string,
+       userId: string,
+       petId: string
+     ): Promise<string> {
+       // Compress image
+       const resizedImage = await ImageResizer.createResizedImage(
+         uri,
+         800,
+         800,
+         'JPEG',
+         85
+       );
+       
+       const reference = storage().ref(
+         `pet_photos/${userId}/${petId}/${Date.now()}.jpg`
+       );
+       await reference.putFile(resizedImage.uri);
+       return await reference.getDownloadURL();
      }
    }
    ```
 
 4. **FCM Push Notifications:**
-   ```dart
-   class FCMService {
-     static Future<void> initialize() async {
-       await FirebaseMessaging.instance.requestPermission();
+   ```typescript
+   // Web: packages/shared/src/services/fcmService.ts
+   import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+   
+   export class FCMService {
+     static async initialize() {
+       const messaging = getMessaging();
        
-       // Handle foreground messages
-       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-         // Show local notification
+       // Request permission and get token
+       const token = await getToken(messaging, {
+         vapidKey: 'YOUR_VAPID_KEY'
        });
        
-       // Handle background messages (requires top-level function)
-       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+       // Handle foreground messages
+       onMessage(messaging, (payload) => {
+         // Show notification
+         new Notification(payload.notification?.title || '', {
+           body: payload.notification?.body,
+           icon: payload.notification?.icon
+         });
+       });
+       
+       return token;
      }
-     
-     static Future<String?> getFCMToken() async {
-       return await FirebaseMessaging.instance.getToken();
+   }
+   ```
+
+   ```typescript
+   // React Native: packages/shared/src/services/fcmService.rn.ts
+   import messaging from '@react-native-firebase/messaging';
+   
+   export class FCMServiceRN {
+     static async initialize() {
+       await messaging().requestPermission();
+       
+       // Get FCM token
+       const token = await messaging().getToken();
+       
+       // Handle foreground messages
+       messaging().onMessage(async (remoteMessage) => {
+         // Show local notification
+         // Use react-native-push-notification or similar
+       });
+       
+       // Handle background messages (in index.js)
+       messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+         // Handle background notification
+       });
+       
+       return token;
      }
    }
    ```
 
 **Platform-Specific Optimizations:**
 
-1. **iOS (iOS folder):**
+1. **iOS (React Native - packages/mobile/ios/):**
    - Configure `Info.plist` for Firebase
-   - Set up push notification capabilities
-   - Configure camera and photo library permissions
+   - Set up push notification capabilities in Xcode
+   - Configure camera and photo library permissions in `Info.plist`
+   - Add Firebase iOS SDK configuration files
 
-2. **Android (android folder):**
+2. **Android (React Native - packages/mobile/android/):**
    - Configure `google-services.json` for Firebase
    - Set up FCM in `AndroidManifest.xml`
-   - Configure camera and storage permissions
+   - Configure camera and storage permissions in `AndroidManifest.xml`
+   - Add Firebase Android SDK configuration
 
-3. **Web (web folder):**
-   - Configure Firebase for web
+3. **Web (React - packages/web/):**
+   - Configure Firebase for web with `firebaseConfig`
    - Enable CORS for Firebase Storage
-   - Optimize for responsive design
+   - Optimize for responsive design with CSS media queries
+   - Use Service Workers for offline support
+   - Implement code splitting and lazy loading
+
+4. **Electron (Desktop - packages/desktop/):**
+   - Configure Firebase for Electron renderer process
+   - Set up native file system access for caching
+   - Configure auto-updater with electron-updater
+   - Platform-specific build configurations
 
 **Build Commands:**
 ```bash
 # Development
-flutter run                    # Run on connected device
-flutter run -d chrome          # Run on web
-flutter run -d macos          # Run on macOS
+# Web
+cd packages/web && npm run dev              # Run web dev server
+
+# React Native
+cd packages/mobile && npm run ios          # Run on iOS simulator
+cd packages/mobile && npm run android     # Run on Android emulator
+
+# Electron
+cd packages/desktop && npm run dev         # Run Electron in dev mode
 
 # Build for production
-flutter build ios              # iOS app
-flutter build apk             # Android APK
-flutter build appbundle       # Android App Bundle
-flutter build web             # Web app
-flutter build macos           # macOS app
-flutter build windows         # Windows app
-flutter build linux           # Linux app
+# Web
+cd packages/web && npm run build          # Build for production
+firebase deploy --only hosting            # Deploy to Firebase Hosting
+
+# React Native iOS
+cd packages/mobile && npm run build:ios   # Build iOS app
+# Or use Xcode for App Store builds
+
+# React Native Android
+cd packages/mobile && npm run build:android  # Build Android APK
+cd packages/mobile && npm run build:bundle   # Build Android App Bundle
+
+# Electron
+cd packages/desktop && npm run build:mac     # Build macOS app
+cd packages/desktop && npm run build:win     # Build Windows app
+cd packages/desktop && npm run build:linux    # Build Linux app
 ```
 
 **Testing Strategy:**
-- Unit tests for business logic and repositories
-- Widget tests for UI components
-- Integration tests for critical user flows
+- Unit tests for business logic and repositories (Jest/Vitest)
+- Component tests for React components (React Testing Library)
+- Integration tests for critical user flows (Playwright/Cypress for web, Detox for React Native)
 - Firestore emulator for local testing
+- E2E tests for critical paths
 
 **Performance Optimizations:**
-- Use `ListView.builder` for large lists (not `ListView`)
-- Implement image caching with `cached_network_image`
-- Use `const` constructors where possible
-- Lazy load data with pagination
-- Implement proper state management to avoid unnecessary rebuilds
+- Use virtualized lists (`react-window` for web, `FlatList` for React Native) for large lists
+- Implement image caching with `react-native-fast-image` or `lazy-load-image-component`
+- Use React.memo and useMemo to prevent unnecessary re-renders
+- Lazy load routes and components with React.lazy()
+- Implement proper state management to avoid unnecessary re-renders
+- Code splitting with dynamic imports
+- Bundle optimization with tree shaking
 
 **Deployment:**
-- **iOS:** Xcode → App Store Connect
-- **Android:** `flutter build appbundle` → Google Play Console
-- **Web:** `flutter build web` → Firebase Hosting
-- **Desktop:** Platform-specific distribution (DMG for macOS, MSI for Windows)
+- **iOS:** Build in Xcode → App Store Connect → TestFlight/App Store
+- **Android:** `npm run build:bundle` → Google Play Console → Internal Testing/Production
+- **Web:** `npm run build` → Firebase Hosting (`firebase deploy`)
+- **Electron:** Platform-specific installers (DMG for macOS, MSI/EXE for Windows, AppImage/DEB for Linux)
 
 ---
 
@@ -559,38 +789,38 @@ flutter build linux           # Linux app
 **Strategy:** Store maximum data locally, sync to cloud only when necessary. This reduces Firestore reads by 85-95%.
 
 **Local Storage Stack:**
-- **Hive (NoSQL):** Pet data, user profiles, master data, static data (fast, key-value)
-- **SQLite (sqflite):** Bookings, stay updates, historical data (complex queries)
-- **SharedPreferences:** Settings, app config, last sync timestamps
-- **File System (path_provider):** Invoice PDFs, document cache (download once, cache forever)
+- **IndexedDB (Web) / SQLite (Mobile/Desktop):** Pet data, user profiles, master data, static data (fast, key-value or structured)
+- **SQLite (better-sqlite3 for Electron, react-native-sqlite-storage for Mobile):** Bookings, stay updates, historical data (complex queries)
+- **localStorage (Web) / AsyncStorage (React Native) / Electron Store:** Settings, app config, last sync timestamps
+- **File System (Node.js fs for Electron, react-native-fs for Mobile):** Invoice PDFs, document cache (download once, cache forever)
 
 **Data Storage Strategy:**
 
 | Data Type | Local Storage | Sync Frequency | Cloud Reads Saved | Implementation |
 |-----------|---------------|----------------|-------------------|----------------|
-| User Profile | Hive | On login only | ~98% | Cache after first fetch, update on change |
-| Pets List | Hive | On create/update | ~95% | Primary source: local, sync background |
-| Medical Records | Hive | When vet updates | ~90% | Local cache, sync on new record |
+| User Profile | IndexedDB/SQLite | On login only | ~98% | Cache after first fetch, update on change |
+| Pets List | IndexedDB/SQLite | On create/update | ~95% | Primary source: local, sync background |
+| Medical Records | IndexedDB/SQLite | When vet updates | ~90% | Local cache, sync on new record |
 | Vaccine Schedule | SQLite | Monthly | ~95% | Calculate locally, sync data monthly |
 | Active Bookings | SQLite | On status change | ~80% | Real-time sync only for active bookings |
 | Past Bookings | SQLite | Once, then local | ~100% | Sync once, never re-read from cloud |
 | Stay Updates | SQLite | Every 15 min (batch) | ~85% | Batch sync, not per-update |
 | Invoices | File System | Once (cache forever) | ~100% | Download once, never re-download |
-| Kennel Data | Hive | Weekly | ~95% | Master data changes rarely |
-| Reviews | Hive | On write | ~90% | Cache after fetch, update on new review |
+| Kennel Data | IndexedDB/SQLite | Weekly | ~95% | Master data changes rarely |
+| Reviews | IndexedDB/SQLite | On write | ~90% | Cache after fetch, update on new review |
 
 **Architecture Pattern:**
 
 ```
 ┌─────────────────────────────────────┐
-│      Flutter App (Client)           │
+│  React/React Native/Electron App   │
 ├─────────────────────────────────────┤
 │                                     │
 │  ┌─────────────┐  ┌──────────────┐ │
 │  │ Local Cache │  │ Sync Service │ │
 │  │ (Primary)   │  │ (Background)  │ │
 │  │             │  │               │ │
-│  │ - Hive      │  │ - Checks      │ │
+│  │ - IndexedDB │  │ - Checks      │ │
 │  │ - SQLite    │  │   changes    │ │
 │  │ - Files     │  │ - Batch sync │ │
 │  └──────┬──────┘  └───────┬───────┘ │
@@ -612,180 +842,275 @@ flutter build linux           # Linux app
 
 **Implementation Example - Local-First Repository:**
 
-```dart
+```typescript
+// packages/shared/src/repositories/petRepository.ts
 // Pet Repository - Local-First Pattern
-class PetRepository {
-  final HiveInterface _localDB;
-  final FirebaseFirestore _firestore;
-  final SyncService _syncService;
+import { openDB, IDBPDatabase } from 'idb'; // Web: IndexedDB
+// import SQLite from 'react-native-sqlite-storage'; // React Native
+// import Database from 'better-sqlite3'; // Electron
+import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { firestore } from '../config/firebase';
+import { syncService } from '../services/syncService';
+
+export class PetRepository {
+  private db: IDBPDatabase | null = null;
+  
+  async init() {
+    // Web: Initialize IndexedDB
+    this.db = await openDB('pet-management', 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains('pets')) {
+          db.createObjectStore('pets', { keyPath: 'id' });
+        }
+      },
+    });
+  }
   
   // Read from local first, sync in background
-  Future<List<Pet>> getPets(String userId) async {
+  async getPets(userId: string): Promise<Pet[]> {
+    await this.init();
+    
     // 1. Read from local cache (instant, no cloud read)
-    final localPets = _localDB.box<Pet>('pets')
-        .values
-        .where((p) => p.ownerId == userId)
-        .toList();
+    const tx = this.db!.transaction('pets', 'readonly');
+    const store = tx.objectStore('pets');
+    const allPets = await store.getAll();
+    const localPets = allPets.filter(p => p.ownerId === userId);
     
     // 2. Return immediately (optimistic)
-    if (localPets.isNotEmpty) {
+    if (localPets.length > 0) {
       // Trigger background sync (non-blocking)
-      _syncService.syncPets(userId).catchError((e) => print(e));
+      syncService.syncPets(userId).catch(console.error);
       return localPets;
     }
     
     // 3. If no local data, fetch from cloud (first time only)
-    final cloudPets = await _fetchFromCloud(userId);
-    await _saveToLocal(cloudPets);
+    const cloudPets = await this._fetchFromCloud(userId);
+    await this._saveToLocal(cloudPets);
     return cloudPets;
   }
   
-  Future<void> addPet(Pet pet) async {
+  async addPet(pet: Pet): Promise<void> {
+    await this.init();
+    
     // 1. Save locally first (optimistic UI)
-    await _localDB.box<Pet>('pets').put(pet.id, pet);
+    const tx = this.db!.transaction('pets', 'readwrite');
+    await tx.objectStore('pets').put(pet);
+    await tx.done;
     
     // 2. Sync to cloud in background (non-blocking)
-    await _syncService.syncPetToCloud(pet);
+    await syncService.syncPetToCloud(pet);
+  }
+  
+  private async _fetchFromCloud(userId: string): Promise<Pet[]> {
+    const q = query(
+      collection(firestore, 'pets'),
+      where('ownerId', '==', userId)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Pet));
+  }
+  
+  private async _saveToLocal(pets: Pet[]): Promise<void> {
+    const tx = this.db!.transaction('pets', 'readwrite');
+    for (const pet of pets) {
+      await tx.objectStore('pets').put(pet);
+    }
+    await tx.done;
   }
 }
 ```
 
 **Sync Service (Background Sync):**
 
-```dart
+```typescript
+// packages/shared/src/services/syncService.ts
 // Sync Service - Intelligent Batching
-class SyncService {
-  final FirebaseFirestore _firestore;
-  final HiveInterface _localDB;
-  final SharedPreferences _prefs;
-  
+import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore';
+import { firestore } from '../config/firebase';
+import { openDB } from 'idb';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // React Native
+// or localStorage for web
+
+export class SyncService {
   // Only sync changed data (minimize reads)
-  Future<void> syncPets(String userId) async {
-    final lastSync = _prefs.getInt('last_pet_sync_$userId') ?? 0;
-    final now = DateTime.now().millisecondsSinceEpoch;
+  async syncPets(userId: string): Promise<void> {
+    const lastSyncKey = `last_pet_sync_${userId}`;
+    const lastSync = parseInt(await AsyncStorage.getItem(lastSyncKey) || '0');
+    const now = Date.now();
     
     // Only sync if > 1 hour since last sync
     if (now - lastSync < 3600000) return;
     
     try {
       // Get only recently updated pets from cloud
-      final snapshot = await _firestore
-          .collection('pets')
-          .where('ownerId', isEqualTo: userId)
-          .where('updatedAt', isGreaterThan: Timestamp.fromMillisecondsSinceEpoch(lastSync))
-          .get();
+      const q = query(
+        collection(firestore, 'pets'),
+        where('ownerId', '==', userId),
+        where('updatedAt', '>', Timestamp.fromMillis(lastSync))
+      );
+      const snapshot = await getDocs(q);
       
       // Update local cache
-      final box = _localDB.box<Pet>('pets');
-      for (final doc in snapshot.docs) {
-        await box.put(doc.id, Pet.fromFirestore(doc));
-      }
+      const db = await openDB('pet-management', 1);
+      const tx = db.transaction('pets', 'readwrite');
+      snapshot.docs.forEach(doc => {
+        tx.store.put({ id: doc.id, ...doc.data() });
+      });
+      await tx.done;
       
-      await _prefs.setInt('last_pet_sync_$userId', now);
+      await AsyncStorage.setItem(lastSyncKey, now.toString());
     } catch (e) {
       // Fail silently - local data is still available
+      console.error('Sync failed:', e);
     }
+  }
+  
+  async syncPetToCloud(pet: Pet): Promise<void> {
+    // Sync single pet to cloud
+    // Implementation similar to above
   }
 }
 ```
 
 **SQLite for Bookings (Complex Queries Locally):**
 
-```dart
+```typescript
+// packages/shared/src/repositories/bookingRepository.ts
 // Booking Database - All queries local
-class BookingDatabase {
-  Future<List<Booking>> getBookings(String userId) async {
-    final db = await database;
+import Database from 'better-sqlite3'; // Electron
+// import SQLite from 'react-native-sqlite-storage'; // React Native
+
+export class BookingRepository {
+  private db: Database.Database;
+  
+  constructor() {
+    this.db = new Database('bookings.db');
+    this._initSchema();
+  }
+  
+  private _initSchema() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS bookings (
+        id TEXT PRIMARY KEY,
+        userId TEXT NOT NULL,
+        createdAt INTEGER NOT NULL,
+        updatedAt INTEGER NOT NULL,
+        status TEXT NOT NULL,
+        data TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_userId ON bookings(userId);
+    `);
+  }
+  
+  async getBookings(userId: string): Promise<Booking[]> {
     // Query local SQLite (no cloud read)
-    final maps = await db.query(
-      'bookings',
-      where: 'userId = ?',
-      whereArgs: [userId],
-      orderBy: 'createdAt DESC',
-    );
-    return maps.map((map) => Booking.fromMap(map)).toList();
+    const stmt = this.db.prepare(`
+      SELECT * FROM bookings 
+      WHERE userId = ? 
+      ORDER BY createdAt DESC
+    `);
+    const rows = stmt.all(userId);
+    return rows.map(row => JSON.parse(row.data) as Booking);
   }
   
   // Sync only changed bookings (minimal reads)
-  Future<void> syncBookings(String userId) async {
-    final lastSync = await _getLastSync('bookings');
-    final snapshot = await _firestore
-        .collection('bookings')
-        .where('userId', isEqualTo: userId)
-        .where('updatedAt', isGreaterThan: Timestamp.fromMillisecondsSinceEpoch(lastSync))
-        .limit(50) // Limit to reduce reads
-        .get();
+  async syncBookings(userId: string): Promise<void> {
+    const lastSync = await this._getLastSync('bookings');
+    const q = query(
+      collection(firestore, 'bookings'),
+      where('userId', '==', userId),
+      where('updatedAt', '>', Timestamp.fromMillis(lastSync))
+    ).limit(50); // Limit to reduce reads
+    
+    const snapshot = await getDocs(q);
     
     // Update local database
-    final db = await database;
-    await db.transaction((txn) async {
-      for (final doc in snapshot.docs) {
-        await txn.insert(
-          'bookings',
-          Booking.fromFirestore(doc).toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace,
+    const insert = this.db.prepare(`
+      INSERT OR REPLACE INTO bookings (id, userId, createdAt, updatedAt, status, data)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `);
+    
+    const insertMany = this.db.transaction((bookings) => {
+      for (const doc of bookings) {
+        const booking = { id: doc.id, ...doc.data() } as Booking;
+        insert.run(
+          booking.id,
+          booking.userId,
+          booking.createdAt,
+          booking.updatedAt,
+          booking.status,
+          JSON.stringify(booking)
         );
       }
     });
+    
+    insertMany(snapshot.docs);
   }
 }
 ```
 
 **File Cache for Invoices (Download Once):**
 
-```dart
+```typescript
+// packages/shared/src/services/invoiceService.ts
 // Invoice Service - Cache Forever
-class InvoiceService {
-  Future<File> getInvoice(String invoiceId, String userId) async {
-    final localPath = join(_cacheDir.path, 'invoices', '$invoiceId.pdf');
-    final localFile = File(localPath);
+import { ref, getDownloadURL } from 'firebase/storage';
+import { storage } from '../config/firebase';
+import * as fs from 'fs';
+import * as path from 'path';
+import { app } from 'electron'; // Electron
+// or use react-native-fs for React Native
+// or use fetch + IndexedDB for Web
+
+export class InvoiceService {
+  private cacheDir: string;
+  
+  constructor() {
+    // Electron: Use app.getPath('userData')
+    this.cacheDir = path.join(app.getPath('userData'), 'invoices');
+    if (!fs.existsSync(this.cacheDir)) {
+      fs.mkdirSync(this.cacheDir, { recursive: true });
+    }
+  }
+  
+  async getInvoice(invoiceId: string, userId: string): Promise<string> {
+    const localPath = path.join(this.cacheDir, `${invoiceId}.pdf`);
     
     // Check if already cached locally (no cloud read)
-    if (await localFile.exists()) {
-      return localFile; // Instant, no cost
+    if (fs.existsSync(localPath)) {
+      return localPath; // Instant, no cost
     }
     
     // Download only once, cache forever
-    final ref = _storage.ref().child('invoices/$userId/$invoiceId.pdf');
-    final downloadUrl = await ref.getDownloadURL();
-    final response = await http.get(Uri.parse(downloadUrl));
-    await localFile.create(recursive: true);
-    await localFile.writeAsBytes(response.bodyBytes);
+    const storageRef = ref(storage, `invoices/${userId}/${invoiceId}.pdf`);
+    const downloadUrl = await getDownloadURL(storageRef);
+    const response = await fetch(downloadUrl);
+    const buffer = await response.arrayBuffer();
+    fs.writeFileSync(localPath, Buffer.from(buffer));
     
-    return localFile;
+    return localPath;
   }
 }
 ```
 
-**Updated Flutter Dependencies (Local Storage Focus):**
+**Updated React/React Native/Electron Dependencies (Local Storage Focus):**
 
-```yaml
-dependencies:
-  # Local Storage (Primary)
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
-  sqflite: ^2.3.0
-  shared_preferences: ^2.2.0
-  path_provider: ^2.1.0
-  path: ^1.8.3
-  
-  # Sync & Connectivity
-  connectivity_plus: ^5.0.0
-  workmanager: ^0.5.2  # Background sync
-  
-  # Firebase (Minimal - sync only)
-  firebase_core: ^3.0.0
-  firebase_auth: ^5.0.0
-  cloud_firestore: ^5.0.0  # Only for sync operations
-  firebase_storage: ^12.0.0  # Only for uploads
-  
-  # Utilities
-  intl: ^0.19.0
-  http: ^1.1.0
-
-dev_dependencies:
-  hive_generator: ^2.0.0
-  build_runner: ^2.4.0
+```json
+{
+  "dependencies": {
+    "idb": "^7.0.0",
+    "better-sqlite3": "^9.0.0",
+    "react-native-sqlite-storage": "^6.0.0",
+    "@react-native-async-storage/async-storage": "^1.21.0",
+    "@react-native-community/netinfo": "^11.0.0",
+    "react-native-fs": "^2.20.0",
+    "firebase": "^10.0.0",
+    "@react-native-firebase/app": "^18.0.0",
+    "@react-native-firebase/firestore": "^18.0.0",
+    "@react-native-firebase/storage": "^18.0.0",
+    "date-fns": "^2.30.0"
+  }
+}
 ```
 
 **Cost Savings with Local-First Architecture:**
@@ -799,9 +1124,9 @@ dev_dependencies:
 
 **Optimization by User Story:**
 
-1. **PO-02 (Pet Registration):** Store locally in Hive, sync only on create/update → **90% fewer reads**
+1. **PO-02 (Pet Registration):** Store locally in IndexedDB/SQLite, sync only on create/update → **90% fewer reads**
 2. **PO-04 (Vaccine Reminders):** Calculate locally from SQLite, sync monthly → **95% fewer reads**
-3. **PO-05 (Kennel Search):** Search local Hive cache (weekly sync) → **80% fewer reads**
+3. **PO-05 (Kennel Search):** Search local IndexedDB/SQLite cache (weekly sync) → **80% fewer reads**
 4. **PO-07 (Stay Updates):** Store in SQLite, batch sync every 15 min → **85% fewer reads**
 5. **PO-08 (Invoices):** Cache PDFs locally, download once → **100% fewer re-reads**
 6. **KS-01 (Staff Check-ins):** Load from local SQLite, sync on status change → **70% fewer reads**
@@ -840,12 +1165,12 @@ dev_dependencies:
 
 ```
 ┌─────────────────────────────────────┐
-│      Flutter App                    │
+│  React/React Native/Electron App   │
 ├─────────────────────────────────────┤
 │                                     │
 │  ┌───────────────────────────────┐ │
 │  │  Local Storage (Primary)     │ │
-│  │  - Hive (Pets, Users, Master)│ │
+│  │  - IndexedDB/SQLite (Pets, Users, Master)│ │
 │  │  - SQLite (Bookings, Updates)│ │
 │  │  - Files (Invoices, Docs)    │ │
 │  └───────────┬───────────────────┘ │
@@ -876,30 +1201,43 @@ dev_dependencies:
 
 **Connection Service:**
 
-```dart
-// lib/core/services/connection_service.dart
-class ConnectionService {
-  final Connectivity _connectivity = Connectivity();
-  final SharedPreferences _prefs;
-  
+```typescript
+// packages/shared/src/services/connectionService.ts
+import NetInfo from '@react-native-community/netinfo'; // React Native
+// or navigator.onLine for Web
+import { collection, getDocs, limit, query } from 'firebase/firestore';
+import { firestore } from '../config/firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+// or localStorage for Web
+
+export class ConnectionService {
   // Detect network connectivity
-  Stream<bool> get isConnectedStream => _connectivity.onConnectivityChanged
-      .map((result) => result != ConnectivityResult.none);
+  get isConnectedStream() {
+    // React Native
+    return NetInfo.addEventListener(state => {
+      return state.isConnected ?? false;
+    });
+    // Web: Use navigator.onLine event listeners
+  }
   
-  Future<bool> get isConnected async {
-    final result = await _connectivity.checkConnectivity();
-    return result != ConnectivityResult.none;
+  async isConnected(): Promise<boolean> {
+    // React Native
+    const state = await NetInfo.fetch();
+    return state.isConnected ?? false;
+    // Web: return navigator.onLine;
   }
   
   // Check if Firebase is actually reachable
-  Future<bool> get isFirebaseReachable async {
-    if (!await isConnected) return false;
+  async isFirebaseReachable(): Promise<boolean> {
+    if (!await this.isConnected()) return false;
     try {
-      await FirebaseFirestore.instance
-          .collection('health')
-          .limit(1)
-          .get()
-          .timeout(Duration(seconds: 3));
+      const q = query(collection(firestore, 'health'), limit(1));
+      await Promise.race([
+        getDocs(q),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), 3000)
+        )
+      ]);
       return true;
     } catch (e) {
       return false;
@@ -907,12 +1245,13 @@ class ConnectionService {
   }
   
   // Offline mode toggle (for testing/development)
-  Future<void> setOfflineMode(bool enabled) async {
-    await _prefs.setBool('offline_mode', enabled);
+  async setOfflineMode(enabled: boolean): Promise<void> {
+    await AsyncStorage.setItem('offline_mode', enabled.toString());
   }
   
-  Future<bool> get isOfflineMode async {
-    return _prefs.getBool('offline_mode') ?? false;
+  async isOfflineMode(): Promise<boolean> {
+    const value = await AsyncStorage.getItem('offline_mode');
+    return value === 'true';
   }
 }
 ```
@@ -1250,8 +1589,9 @@ if (pendingCount > 0) {
 **Savings: 90-95% reduction vs Cloud-Only, 97-98% vs AWS**
 
 **Development Cost:**
-- Flutter SDK: Free
-- Dart: Free
+- React/React Native/Electron: Free (open source)
+- Node.js: Free
+- TypeScript: Free
 - Firebase SDK: Free
 - iOS Developer Account: $99/year
 - Android Developer Account: $25 one-time

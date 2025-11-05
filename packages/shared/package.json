@@ -1,0 +1,23 @@
+{
+  "name": "@pet-management/shared",
+  "version": "1.0.0",
+  "description": "Shared business logic, services, models, and utilities",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "firebase": "^10.7.0",
+    "idb": "^7.1.1",
+    "date-fns": "^3.0.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0"
+  }
+}
+
