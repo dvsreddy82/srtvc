@@ -4,13 +4,14 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import { Provider as ReduxProvider } from 'react-redux';
 import { store } from './store/store';
 import { theme } from './shared/theme';
+import { AppNavigator } from './navigation/AppNavigator';
 
 function App(): React.JSX.Element {
   return (
     <ReduxProvider store={store}>
       <PaperProvider theme={theme}>
         <NavigationContainer>
-          {/* Navigation will be added here */}
+          <AppNavigator />
         </NavigationContainer>
       </PaperProvider>
     </ReduxProvider>
@@ -18,4 +19,3 @@ function App(): React.JSX.Element {
 }
 
 export default App;
-
