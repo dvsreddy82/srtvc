@@ -18,7 +18,7 @@ import {
   Grid,
 } from '@mui/material';
 import { submitMedicalRecord } from '../../../store/slices/veterinarianSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import type { MedicalRecord } from '@pet-management/shared';
 
 interface SubmitMedicalRecordProps {

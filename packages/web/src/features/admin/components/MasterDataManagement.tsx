@@ -31,7 +31,7 @@ import {
 } from '@mui/material';
 import { Add, Edit } from '@mui/icons-material';
 import { loadBreeds, loadVaccineTypes, saveBreed, saveVaccineType, clearError } from '../../../store/slices/adminSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import type { Breed, VaccineType } from '@pet-management/shared';
 
 export const MasterDataManagement: React.FC = () => {

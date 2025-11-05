@@ -22,7 +22,7 @@ import { Upload, Pets, ExitToApp } from '@mui/icons-material';
 import { loadActiveBookings, clearError } from '../../../store/slices/staffSlice';
 import { UploadStayUpdate } from './UploadStayUpdate';
 import { CheckOutPet } from './CheckOutPet';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import { format } from 'date-fns';
 import type { Booking } from '@pet-management/shared';
 

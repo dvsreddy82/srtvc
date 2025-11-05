@@ -29,7 +29,7 @@ import {
 } from '@mui/material';
 import { Add, Edit } from '@mui/icons-material';
 import { loadStaffAssignments, saveStaffAssignment, clearError } from '../../../store/slices/staffManagementSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import type { StaffAssignment } from '@pet-management/shared';
 
 export const StaffManagement: React.FC = () => {

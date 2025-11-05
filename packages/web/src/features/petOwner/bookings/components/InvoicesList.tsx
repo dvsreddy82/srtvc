@@ -20,7 +20,7 @@ import {
   Paper,
 } from '@mui/material';
 import { Download, Refresh, Receipt } from '@mui/icons-material';
-import { loadInvoices, syncNewInvoices, clearError } from '../../../store/slices/invoiceSlice';
+import { loadInvoices, syncNewInvoices, clearError } from '../../../../store/slices/invoiceSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import { format } from 'date-fns';
 import type { Invoice } from '@pet-management/shared';

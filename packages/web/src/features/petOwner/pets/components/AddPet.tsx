@@ -14,7 +14,7 @@ import {
   Select,
   Avatar,
 } from '@mui/material';
-import { createPet, clearError } from '../../../store/slices/petSlice';
+import { createPet, clearError } from '../../../../store/slices/petSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import type { Pet } from '@pet-management/shared';
 

@@ -14,9 +14,11 @@ export * from './models/masterData';
 
 // Export services
 export * from './services/authService';
+export { authService } from './services/authService';
 export * from './services/firestoreService';
 export { firestoreService } from './services/firestoreService';
 export * from './services/localStorageService';
+export { localStorageService } from './services/localStorageService';
 export * from './services/imageService';
 export * from './services/medicalRecordService';
 export * from './services/vaccineScheduleService';
@@ -42,6 +44,7 @@ export type { ExportOptions, ExportResult } from './services/exportService';
 
 // Export repositories
 export * from './repositories/userRepository';
+export { userRepository } from './repositories/userRepository';
 export * from './repositories/petRepository';
 export * from './repositories/medicalRecordRepository';
 export * from './repositories/vaccineRepository';

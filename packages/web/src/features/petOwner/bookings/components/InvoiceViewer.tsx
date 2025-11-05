@@ -13,8 +13,7 @@ import {
   CardContent,
 } from '@mui/material';
 import { ArrowBack, Download } from '@mui/icons-material';
-import { loadInvoicePDF, setCurrentInvoice, clearError } from '../../../store/slices/invoiceSlice';
-import { loadInvoices } from '../../../store/slices/invoiceSlice';
+import { loadInvoicePDF, setCurrentInvoice, clearError, loadInvoices } from '../../../../store/slices/invoiceSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import { format } from 'date-fns';
 import type { Invoice } from '@pet-management/shared';

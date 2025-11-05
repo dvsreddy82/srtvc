@@ -17,6 +17,7 @@ import { BookingsList } from './features/petOwner/bookings/components/BookingsLi
 import { BookingDetails } from './features/petOwner/bookings/components/BookingDetails';
 import { InvoicesList } from './features/petOwner/bookings/components/InvoicesList';
 import { InvoiceViewer } from './features/petOwner/bookings/components/InvoiceViewer';
+import { Dashboard } from './features/petOwner/dashboard/Dashboard';
 import type { AppDispatch, RootState } from './store/store';
 
 function App() {
@@ -27,10 +28,16 @@ function App() {
     // Initialize auth state and Firestore offline persistence
     dispatch(initializeAuth());
 
-    // Initialize FCM for stay update notifications
+    // Initialize FCM for stay update notifications (optional - may fail if not configured)
     if (typeof window !== 'undefined' && 'Notification' in window) {
       import('./services/fcmService').then(({ FCMService }) => {
-        FCMService.initialize().catch(console.error);
+        FCMService.initialize().catch((error) => {
+          // FCM is optional - log but don't crash the app
+          console.warn('FCM initialization failed (this is optional):', error);
+        });
+      }).catch((error) => {
+        // Module import failed - FCM may not be available
+        console.warn('FCM service not available (this is optional):', error);
       });
     }
 
@@ -103,10 +110,7 @@ function App() {
             path="/dashboard"
             element={
               <ProtectedRoute>
-                <div>
-                  <h1>Dashboard</h1>
-                  <p>Welcome, {user?.email}</p>
-                </div>
+                <Dashboard />
               </ProtectedRoute>
             }
           />

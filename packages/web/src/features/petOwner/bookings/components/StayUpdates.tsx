@@ -16,7 +16,7 @@ import {
 } from '@mui/material';
 import { Refresh, PhotoLibrary, Note, Restaurant, FitnessCenter, LocalHospital } from '@mui/icons-material';
 import { FixedSizeList as List } from 'react-window';
-import { loadStayUpdates, syncStayUpdates, clearError, addUpdate } from '../../../store/slices/stayUpdateSlice';
+import { loadStayUpdates, syncStayUpdates, clearError, addUpdate } from '../../../../store/slices/stayUpdateSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import { format, formatDistanceToNow } from 'date-fns';
 import type { StayUpdate } from '@pet-management/shared';

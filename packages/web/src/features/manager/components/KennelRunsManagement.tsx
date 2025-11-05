@@ -29,7 +29,7 @@ import {
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
 import { loadKennelRuns, saveKennelRun, deleteKennelRun, clearError } from '../../../store/slices/managerSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import type { KennelRun } from '@pet-management/shared';
 
 export const KennelRunsManagement: React.FC = () => {

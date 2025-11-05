@@ -18,7 +18,7 @@ import {
   DialogActions,
 } from '@mui/material';
 import { CloudUpload, Close } from '@mui/icons-material';
-import { uploadVaccineDocument, clearError } from '../../../store/slices/medicalRecordSlice';
+import { uploadVaccineDocument, clearError } from '../../../../store/slices/medicalRecordSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import type { MedicalRecord } from '@pet-management/shared';
 
@@ -171,7 +171,7 @@ export const UploadVaccineDocument: React.FC<UploadVaccineDocumentProps> = ({
             </Button>
             {fileName && (
               <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                {fileName} ({(file?.size || 0) / 1024).toFixed(2)} KB)
+                {fileName} ({((file?.size || 0) / 1024).toFixed(2)} KB)
               </Typography>
             )}
           </Box>

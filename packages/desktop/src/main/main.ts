@@ -28,7 +28,7 @@ function createWindow(): void {
   const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
   
   if (isDev) {
-    mainWindow.loadURL('http://localhost:3000'); // Web dev server port
+    mainWindow.loadURL('http://localhost:5200'); // Web dev server port
     mainWindow.webContents.openDevTools();
   } else {
     // In production, load from built renderer

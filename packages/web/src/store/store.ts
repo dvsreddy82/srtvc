@@ -37,6 +37,22 @@ export const store = configureStore({
     systemMonitoring: systemMonitoringReducer,
     userManagement: userManagementReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore Firebase User objects in auth actions (Firebase User is not serializable)
+        ignoredActions: [
+          'auth/setUser',
+          'auth/signup/fulfilled',
+          'auth/login/fulfilled',
+          'auth/initialize/fulfilled',
+        ],
+        // Ignore these field paths in all actions
+        ignoredActionPaths: ['payload.user', 'meta.arg'],
+        // Ignore Firebase User object in the state
+        ignoredPaths: ['auth.user'],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

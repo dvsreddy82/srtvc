@@ -20,13 +20,12 @@ import {
   Paper,
 } from '@mui/material';
 import { Search, LocationOn, AttachMoney, Pets } from '@mui/icons-material';
-import { searchKennels, clearError, clearResults } from '../../../store/slices/kennelSlice';
-import { loadKennelRating } from '../../../store/slices/reviewSlice';
+import { searchKennels, clearError, clearResults } from '../../../../store/slices/kennelSlice';
+import { loadKennelRating } from '../../../../store/slices/reviewSlice';
 import { ReviewsList } from './ReviewsList';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import type { KennelSearchFilters } from '@pet-management/shared';
 import { format } from 'date-fns';
-import { useEffect } from 'react';
 
 export const KennelSearch: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

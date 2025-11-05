@@ -15,10 +15,10 @@ import {
   Chip,
 } from '@mui/material';
 import { ArrowBack, CheckCircle, Payment } from '@mui/icons-material';
-import { createBooking, clearError } from '../../../store/slices/bookingSlice';
+import { createBooking, clearError } from '../../../../store/slices/bookingSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import { format } from 'date-fns';
-import { loadPets } from '../../../store/slices/petSlice';
+import { loadPets } from '../../../../store/slices/petSlice';
 
 export const CreateBooking: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

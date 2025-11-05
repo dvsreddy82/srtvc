@@ -19,7 +19,7 @@ import {
   Paper,
 } from '@mui/material';
 import { Warning, Schedule, CheckCircle } from '@mui/icons-material';
-import { loadVaccineSchedule, clearError } from '../../../store/slices/vaccineSlice';
+import { loadVaccineSchedule, clearError } from '../../../../store/slices/vaccineSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import { format } from 'date-fns';
 import type { Pet } from '@pet-management/shared';

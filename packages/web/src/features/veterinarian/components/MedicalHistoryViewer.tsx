@@ -25,7 +25,7 @@ import {
 import { Search, Visibility } from '@mui/icons-material';
 import { getMedicalHistory, clearError } from '../../../store/slices/veterinarianSlice';
 import { SubmitMedicalRecord } from './SubmitMedicalRecord';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import { format } from 'date-fns';
 import type { MedicalRecord } from '@pet-management/shared';
 

@@ -25,7 +25,7 @@ import {
   loadSystemHealth,
   clearError,
 } from '../../../store/slices/systemMonitoringSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import { format } from 'date-fns';
 
 export const SystemHealthDashboard: React.FC = () => {

@@ -1,18 +1,26 @@
 /**
  * FCM Service - Web Implementation
  * Handles Firebase Cloud Messaging for stay updates
+ * 
+ * NOTE: This service is optional and may not be available if:
+ * - Firebase messaging is not configured
+ * - Service worker is not set up
+ * - VAPID key is not configured
  */
 
-import { getMessaging, getToken, onMessage, Messaging } from 'firebase/messaging';
 import { getAuthInstance } from '@pet-management/shared';
 import { doc, updateDoc } from 'firebase/firestore';
 import { getFirestoreInstance } from '@pet-management/shared';
 import { COLLECTIONS } from '@pet-management/shared';
 
 // VAPID key - should be set in environment variables
-const VAPID_KEY = process.env.VITE_FIREBASE_VAPID_KEY || '';
+const VAPID_KEY = (typeof import.meta !== 'undefined' && (import.meta as { env?: Record<string, string> }).env?.VITE_FIREBASE_VAPID_KEY) || '';
+
+// Type for messaging - dynamically imported
+type Messaging = any;
 
 let messaging: Messaging | null = null;
+let messagingModulePromise: Promise<any> | null = null;
 
 export class FCMService {
   /**
@@ -32,8 +40,47 @@ export class FCMService {
         return null;
       }
 
-      // Initialize messaging
-      const { getMessaging, getToken } = await import('firebase/messaging');
+      // Initialize messaging (dynamic import to avoid issues in non-browser environments)
+      // Firebase messaging requires service worker setup and may not be available
+      // Load messaging module lazily with error handling
+      // Use string concatenation to prevent Vite from statically analyzing the import
+      if (!messagingModulePromise) {
+        messagingModulePromise = (async () => {
+          try {
+            // Construct module path dynamically to prevent static analysis
+            const firebasePkg = 'firebase';
+            const messagingPkg = 'messaging';
+            const modulePath = `${firebasePkg}/${messagingPkg}`;
+            
+            // @ts-ignore - Dynamic import for optional Firebase messaging
+            return await import(modulePath);
+          } catch (error: any) {
+            messagingModulePromise = null; // Reset on failure
+            throw error;
+          }
+        })();
+      }
+
+      let messagingModule;
+      try {
+        messagingModule = await messagingModulePromise;
+      } catch (importError: any) {
+        // If module resolution fails, it might not be available or configured
+        if (importError?.message?.includes('Failed to resolve') || 
+            importError?.message?.includes('module specifier') ||
+            importError?.code === 'ERR_MODULE_NOT_FOUND') {
+          console.warn('Firebase Cloud Messaging is not available. This feature requires:');
+          console.warn('1. Firebase messaging package installed');
+          console.warn('2. Service worker configured');
+          console.warn('3. VAPID key configured');
+          console.warn('FCM will be disabled for this session.');
+          return null; // Return null instead of throwing - FCM is optional
+        }
+        throw importError;
+      }
+      
+      const { getMessaging, getToken, onMessage } = messagingModule;
+      
       messaging = getMessaging();
       
       // Get FCM token
@@ -106,7 +153,29 @@ export class FCMService {
     }
 
     try {
-      const { getToken } = await import('firebase/messaging');
+      // Use the same lazy loading pattern
+      if (!messagingModulePromise) {
+        messagingModulePromise = (async () => {
+          try {
+            // Construct module path dynamically
+            const firebasePkg = 'firebase';
+            const messagingPkg = 'messaging';
+            const modulePath = `${firebasePkg}/${messagingPkg}`;
+            // @ts-ignore - Dynamic import for optional Firebase messaging
+            return await import(modulePath);
+          } catch (error: any) {
+            messagingModulePromise = null;
+            return null;
+          }
+        })();
+      }
+      
+      const messagingModule = await messagingModulePromise;
+      if (!messagingModule) {
+        return null;
+      }
+      
+      const { getToken } = messagingModule;
       return await getToken(messaging, { vapidKey: VAPID_KEY });
     } catch (error) {
       console.error('Failed to get FCM token:', error);

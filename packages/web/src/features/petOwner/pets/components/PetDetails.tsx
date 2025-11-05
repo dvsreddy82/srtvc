@@ -16,7 +16,7 @@ import {
   Tab,
 } from '@mui/material';
 import { ArrowBack, Edit } from '@mui/icons-material';
-import { loadPetById, clearError } from '../../../store/slices/petSlice';
+import { loadPetById, clearError } from '../../../../store/slices/petSlice';
 import { MedicalRecordsList } from './MedicalRecordsList';
 import { UploadVaccineDocument } from './UploadVaccineDocument';
 import { VaccineSchedule } from './VaccineSchedule';

@@ -15,10 +15,10 @@ import {
   Tab,
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
-import { loadBookingById, clearError } from '../../../store/slices/bookingSlice';
+import { loadBookingById, clearError } from '../../../../store/slices/bookingSlice';
 import { StayUpdates } from './StayUpdates';
 import { CreateReview } from './CreateReview';
-import { loadReviewByBooking } from '../../../store/slices/reviewSlice';
+import { loadReviewByBooking } from '../../../../store/slices/reviewSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import { format } from 'date-fns';
 import type { Booking } from '@pet-management/shared';

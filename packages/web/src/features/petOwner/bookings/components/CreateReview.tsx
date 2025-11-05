@@ -13,7 +13,7 @@ import {
   Alert,
   CircularProgress,
 } from '@mui/material';
-import { createReview, clearError, loadReviewByBooking } from '../../../store/slices/reviewSlice';
+import { createReview, clearError, loadReviewByBooking } from '../../../../store/slices/reviewSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import type { Booking } from '@pet-management/shared';
 

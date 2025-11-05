@@ -25,7 +25,7 @@ import {
 // Note: DatePicker requires @mui/x-date-pickers package
 // For now, using basic TextField with type="date"
 import { generateBookingReport, clearError } from '../../../store/slices/reportsSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import { format } from 'date-fns';
 import type { ReportFilters } from '@pet-management/shared';
 

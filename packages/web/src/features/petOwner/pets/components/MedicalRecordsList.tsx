@@ -13,7 +13,7 @@ import {
   Link,
 } from '@mui/material';
 import { Add as AddIcon, CloudDownload } from '@mui/icons-material';
-import { loadMedicalRecords, clearError } from '../../../store/slices/medicalRecordSlice';
+import { loadMedicalRecords, clearError } from '../../../../store/slices/medicalRecordSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import { format } from 'date-fns';
 import type { MedicalRecord } from '@pet-management/shared';

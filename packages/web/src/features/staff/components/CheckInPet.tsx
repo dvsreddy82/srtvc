@@ -15,7 +15,7 @@ import {
   Grid,
 } from '@mui/material';
 import { checkInPet } from '../../../store/slices/staffSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import type { Booking } from '@pet-management/shared';
 
 interface CheckInPetProps {

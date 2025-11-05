@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { Download, CloudDownload } from '@mui/icons-material';
 import { exportService } from '@pet-management/shared';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 
 const COLLECTIONS = [
   'users',

@@ -22,7 +22,7 @@ import {
 import { Refresh, Pets, Schedule } from '@mui/icons-material';
 import { loadTodayCheckIns, syncTodayCheckIns, clearError } from '../../../store/slices/staffSlice';
 import { CheckInPet } from './CheckInPet';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import { format } from 'date-fns';
 import type { Booking } from '@pet-management/shared';
 

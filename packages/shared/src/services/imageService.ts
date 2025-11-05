@@ -13,7 +13,8 @@ let imageCompression: any = null;
 async function getImageCompression() {
   if (!imageCompression && typeof window !== 'undefined') {
     try {
-      // @ts-ignore - Dynamic import for optional dependency
+      // Dynamic import for optional peer dependency
+      // @ts-ignore - browser-image-compression is an optional peer dependency
       imageCompression = (await import('browser-image-compression')).default;
     } catch (error) {
       console.warn('browser-image-compression not available, image compression will be skipped');

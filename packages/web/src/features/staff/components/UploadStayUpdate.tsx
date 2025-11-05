@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import { Close, PhotoCamera } from '@mui/icons-material';
 import { uploadStayUpdate } from '../../../store/slices/staffSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import type { Booking, StayUpdate } from '@pet-management/shared';
 
 interface UploadStayUpdateProps {

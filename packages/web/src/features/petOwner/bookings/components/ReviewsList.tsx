@@ -12,7 +12,7 @@ import {
   Chip,
   Divider,
 } from '@mui/material';
-import { loadKennelReviews, clearError } from '../../../store/slices/reviewSlice';
+import { loadKennelReviews, clearError } from '../../../../store/slices/reviewSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import { format } from 'date-fns';
 import type { Review } from '@pet-management/shared';

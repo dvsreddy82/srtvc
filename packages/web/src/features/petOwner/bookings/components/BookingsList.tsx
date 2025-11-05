@@ -15,8 +15,8 @@ import {
   Tab,
 } from '@mui/material';
 import { Add as AddIcon, Search, Receipt } from '@mui/icons-material';
-import { loadUserBookings, clearError } from '../../../store/slices/bookingSlice';
-import { loadInvoices } from '../../../store/slices/invoiceSlice';
+import { loadUserBookings, clearError } from '../../../../store/slices/bookingSlice';
+import { loadInvoices } from '../../../../store/slices/invoiceSlice';
 import { InvoicesList } from './InvoicesList';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import { format } from 'date-fns';

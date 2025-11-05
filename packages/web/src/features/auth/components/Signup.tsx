@@ -10,7 +10,7 @@ import {
   CircularProgress,
   Link,
 } from '@mui/material';
-import { signup, clearError } from '../../store/slices/authSlice';
+import { signup, clearError } from '../../../store/slices/authSlice';
 import type { AppDispatch, RootState } from '../../../store/store';
 
 export const Signup: React.FC = () => {

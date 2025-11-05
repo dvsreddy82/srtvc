@@ -15,7 +15,7 @@ import {
   Divider,
 } from '@mui/material';
 import { checkOutPet } from '../../../store/slices/staffSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import { format } from 'date-fns';
 import type { Booking } from '@pet-management/shared';
 

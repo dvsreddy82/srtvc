@@ -36,7 +36,7 @@ import {
   requestPasswordReset,
   clearError,
 } from '../../../store/slices/userManagementSlice';
-import type { AppDispatch, RootState } from '../../../../store/store';
+import type { AppDispatch, RootState } from '../../../store/store';
 import { format } from 'date-fns';
 
 export const UserManagement: React.FC = () => {

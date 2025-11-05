@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 import { FixedSizeList as List } from 'react-window';
-import { loadPets, clearError } from '../../../store/slices/petSlice';
+import { loadPets, clearError } from '../../../../store/slices/petSlice';
 import type { AppDispatch, RootState } from '../../../../store/store';
 import type { Pet } from '@pet-management/shared';
 
