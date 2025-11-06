@@ -404,6 +404,18 @@ section {
     text-decoration: underline;
 }
 
+.phone-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.phone-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
 /* Footer */
 .footer {
     background: var(--text-dark);
