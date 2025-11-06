@@ -1,9 +1,0 @@
-node_modules/
-dist/
-*.log
-.DS_Store
-*.local
-.env
-.env.local
-*.js
-!node_modules/**/*.js
